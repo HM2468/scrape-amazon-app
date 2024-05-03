@@ -47,6 +47,9 @@ gem "bootsnap", require: false
 gem "devise", "~> 4.9"
 gem 'turbo-rails'
 gem 'stimulus-rails'
+gem "tailwindcss-rails", "~> 2.5"
+gem 'nokogiri'
+gem 'rest-client'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -69,5 +72,3 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
-
-gem "tailwindcss-rails", "~> 2.5"
