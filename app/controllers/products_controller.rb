@@ -10,6 +10,16 @@ class ProductsController < ApplicationController
   def show
   end
 
+  def fetch_amazon_data
+    # Example logic to fetch data from Amazon
+    @product = AmazonScrapeService.fetch(params[:url])
+
+    respond_to do |format|
+      format.html # Will look for `views/products/fetch_amazon_data.html.erb`
+      format.json { render json: @product }
+    end
+  end
+
   # GET /products/new
   def new
     @product = Product.new
