@@ -1,10 +1,9 @@
 class AmazonScrapeService
     require 'yaml'
 
-    def initialize(url, create_product: false)
-        @create_product = create_product
+    def initialize(url)
+        @product = Product.new
         @selectors = YAML.load_file(Rails.root.join('config', 'scraper', 'selectors.yml'))
-
         # copy from chrome, temporarily used to avoid being blocked from amazon scraper detector
         @headers = {
           'accept' =>  '*/*',
@@ -25,7 +24,7 @@ class AmazonScrapeService
 
         # extract asin
         @asin = extract_asin(url)
-        raise 'invalid amazon produnct URL' if @asin.nil?
+        return @project.errors.add(:base, 'invalid amazon produnct URL') if @asin.nil?
 
         # asin redis key
         @asin_key = "asin:#{@asin}"
@@ -34,10 +33,11 @@ class AmazonScrapeService
         @parsed_data = { name: nil, brand: nil, origin_price: nil, description: nil, images: [], asin: @asin, amazon_link: @url }
     end
 
-    def scrape
-        response = RestClient.get(@url, headers: @headers) rescue nil
-        if response.code.nil?
-          raise "Page #{@url} must have been blocked by Amazon"
+    def fetch_data
+        begin
+          response = RestClient.get(@url, headers: @headers)
+        rescue => e
+          return @project.errors.add(:base, e.messages)
         end
 
         product = Product.find_by(asin: @asin)
@@ -53,7 +53,8 @@ class AmazonScrapeService
 
         extract_data(html)
         post_process
-        Product.create!(**@parsed_data) if @create_product
+        @project.assign_attributes(**@parsed_data)
+        @project
     end
 
     private
