@@ -33,6 +33,10 @@ class AmazonScrapeService
           return nil
         end
 
+        product = Product.find_by(asin: @asin)
+        # already exists in database
+        return product.attributes.deep_symbolize_keys if product
+
         # reduce the probability of being blocked from amazon scraper detector by reducing the request frequency
         # It is only a temporary solution and can not radically eliminate this issue
         # More complex and advanced mechanism should be imported to address this issue

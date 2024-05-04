@@ -1,7 +1,7 @@
 name:
     css: '#productTitle'
     type: Text
-price:
+origin_price:
     css: '.a-price'
     type: Text
 short_description:
