@@ -15,17 +15,30 @@ class AmazonScrapeService
             'Referer' => 'https://www.amazon.com/',
             'Accept-Language' => 'en-GB,en-US;q=0.9,en;q=0.8'
         }
-        @url = url
+
+        # extract asin
+        @asin = extract_asin(url)
+        raise 'invalid amazon produnct URL' if @asin.nil?
+
+        # remove redundant elements after asin
+        @url = url.split(@asin).first + @asin
     end
 
-    def scrape(url)
-        puts "Downloading #{url}"
-        response = RestClient.get(url, headers: @headers)
+    def scrape
+        puts "Downloading #{@url}"
+        response = RestClient.get(@url, headers: @headers)
         if response.code > 500
-          puts "Page #{url} must have been blocked by Amazon as the status code was #{response.code}"
+          puts "Page #{@url} must have been blocked by Amazon as the status code was #{response.code}"
           return nil
         end
         extract_data(response.body)
+    end
+
+    private
+
+    def extract_asin(url)
+      match = url.match(/\/dp\/([A-Z0-9]{10})/)
+      match ? match[1] : nil
     end
 
     def extract_data(html)
