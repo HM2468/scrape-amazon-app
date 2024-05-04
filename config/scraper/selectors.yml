@@ -4,13 +4,16 @@ name:
 origin_price:
     css: '.a-price'
     type: Text
-short_description:
-    css: '#featurebullets_feature_div'
-    type: Text
 images:
     css: '.imgTagWrapper img'
     type: Attribute
     attribute: data-a-dynamic-image
+brand:
+    css: '#bylineInfo'
+    type: Text
+short_description:
+    css: '#featurebullets_feature_div'
+    type: Text
 product_description:
     css: '#productDescription'
     type: Text

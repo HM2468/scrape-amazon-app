@@ -1,7 +1,7 @@
 class AmazonScrapeService
     require 'yaml'
 
-    def initialize(url)
+    def initialize(url, create_product: false)
         @selectors = YAML.load_file(Rails.root.join('config', 'scraper', 'selectors.yml'))
 
         # copy from chrome, temporarily used to avoid being blocked from amazon scraper detector
@@ -30,13 +30,13 @@ class AmazonScrapeService
         @asin_key = "asin:#{@asin}"
         # remove redundant elements after asin
         @url = url.split(@asin).first + @asin
+        @parsed_data = { name: nil, brand: nil, origin_price: nil, description: nil, images: [], asin: @asin }
     end
 
     def scrape
-        response = RestClient.get(@url, headers: @headers)
-        if response.code != 200
-          puts "Page #{@url} must have been blocked by Amazon as the status code was #{response.code}"
-          return nil
+        response = RestClient.get(@url, headers: @headers) rescue nil
+        if response.code.nil?
+          raise "Page #{@url} must have been blocked by Amazon"
         end
 
         product = Product.find_by(asin: @asin)
@@ -51,6 +51,9 @@ class AmazonScrapeService
         end
 
         extract_data(html)
+        post_process
+        validate_data
+        Product.create!(**@parsed_data) if create_product
     end
 
     private
@@ -62,18 +65,46 @@ class AmazonScrapeService
 
     def extract_data(html)
         page = Nokogiri::HTML(html)
-        data = {}
         @selectors.each do |key, value|
+          key = key.to_sym
           if value['type'] == 'Text'
-            data[key] = page.css(value['css']).text.strip
+            @parsed_data[key] = page.at_css(value['css'])&.text&.strip
           elsif value['type'] == 'Attribute'
             element = page.css(value['css']).first
-            data[key] = element ? element[value['attribute']].strip : nil
+            @parsed_data[key] = element ? element[value['attribute']].strip : nil
           elsif value['type'] == 'Link'
             element = page.css(value['css']).first
-            data[key] = element ? element['href'].strip : nil
+            @parsed_data[key] = element ? element['href'].strip : nil
           end
         end
-        data
+    end
+
+    def post_process
+      price = @parsed_data.delete(:origin_price)
+      @parsed_data[:origin_price] = price.split('$').last.to_f if price.present?
+      images = @parsed_data.delete(:images)
+      @parsed_data[:images] = JSON.parse(images).keys if images.present?
+      brand = @parsed_data.delete(:brand)
+      @parsed_data[:brand] = extract_brand(brand) if brand.present?
+      short_description = @parsed_data.delete(:short_description).to_s
+      product_description = @parsed_data.delete(:product_description).to_s
+      @parsed_data[:description] = short_description + ' ' + product_description
+      @parsed_data
+    end
+
+    # example: "Visit the Kasa Smart Store"
+    # example: "Visit the Apple Store"
+    def extract_brand(phrase)
+      # Use a regular expression to capture the brand name preceding the word 'store'
+      match = phrase.match(/Visit the (.+?) store/i)
+      # Return the captured brand name or nil if no match is found
+      match ? match[1] : phrase
+    end
+
+    def validate_data
+      data = @parsed_data.dup
+      data.delete_if { |key, value| value.blank? }
+
+      raise "scrape amazon data failed" if data.keys.size < 2
     end
 end
