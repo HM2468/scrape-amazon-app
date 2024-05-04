@@ -74,4 +74,10 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+
+  config.cache_store = :redis_cache_store, { url: 'redis://localhost:6379/0' }
+
+  # Use Redis for Active Storage, Action Cable, etc.
+  config.active_storage.service = :local
+  config.action_cable.url = 'redis://localhost:6379/1'
 end
