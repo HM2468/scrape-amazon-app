@@ -30,7 +30,7 @@ class AmazonScrapeService
         @asin_key = "asin:#{@asin}"
         # remove redundant elements after asin
         @url = url.split(@asin).first + @asin
-        @parsed_data = { name: nil, brand: nil, origin_price: nil, description: nil, images: [], asin: @asin }
+        @parsed_data = { name: nil, brand: nil, origin_price: nil, description: nil, images: [], asin: @asin, amazon_link: @url }
     end
 
     def scrape
@@ -52,7 +52,6 @@ class AmazonScrapeService
 
         extract_data(html)
         post_process
-        validate_data
         Product.create!(**@parsed_data) if create_product
     end
 
@@ -99,12 +98,5 @@ class AmazonScrapeService
       match = phrase.match(/Visit the (.+?) store/i)
       # Return the captured brand name or nil if no match is found
       match ? match[1] : phrase
-    end
-
-    def validate_data
-      data = @parsed_data.dup
-      data.delete_if { |key, value| value.blank? }
-
-      raise "scrape amazon data failed" if data.keys.size < 2
     end
 end
