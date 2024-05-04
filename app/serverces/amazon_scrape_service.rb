@@ -57,6 +57,14 @@ class AmazonScrapeService
         @product
     end
 
+    def save_data
+      html = Rails.cache.read(@asin_key)
+      extract_data(html)
+      post_process
+      @product.assign_attributes(**@parsed_data)
+      @product
+    end
+
     private
 
     def extract_asin(url)

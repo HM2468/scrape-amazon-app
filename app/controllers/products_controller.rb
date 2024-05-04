@@ -19,6 +19,20 @@ class ProductsController < ApplicationController
     end
   end
 
+  def save_amazon_data
+    @product = AmazonScrapeService.new(params[:url]).save_data
+
+    respond_to do |format|
+      if @product.save
+        format.html { redirect_to product_url(@product), notice: "Product was successfully saved." }
+        format.json { render :show, status: :created, location: @product }
+      else
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: @product.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
   # GET /products/new
   def new
     @product = Product.new

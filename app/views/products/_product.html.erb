@@ -30,9 +30,10 @@
   <% if action_name != "show" %>
 
     <% if product.id.present? %>
-        <%= link_to "Show this product", product, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
-        <%= link_to "Edit this product", edit_product_path(product), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+      <%= link_to "Show this product", product, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+      <%= link_to "Edit this product", edit_product_path(product), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
     <% else %>
+      <%= link_to "Save this product", save_amazon_data_products_path(url: product.amazon_link), class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
     <% end %>
     <hr class="mt-6">
   <% end %>
