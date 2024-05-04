@@ -20,18 +20,27 @@ class AmazonScrapeService
         @asin = extract_asin(url)
         raise 'invalid amazon produnct URL' if @asin.nil?
 
+        # asin redis key
+        @asin_key = "asin:#{@asin}"
         # remove redundant elements after asin
         @url = url.split(@asin).first + @asin
     end
 
     def scrape
-        puts "Downloading #{@url}"
         response = RestClient.get(@url, headers: @headers)
-        if response.code > 500
+        if response.code != 200
           puts "Page #{@url} must have been blocked by Amazon as the status code was #{response.code}"
           return nil
         end
-        extract_data(response.body)
+
+        # reduce the probability of being blocked from amazon scraper detector by reducing the request frequency
+        # It is only a temporary solution and can not radically eliminate this issue
+        # More complex and advanced mechanism should be imported to address this issue
+        html = Rails.cache.fetch(@asin_key , expires_in: 1.day) do
+          response.body
+        end
+
+        extract_data(html)
     end
 
     private
