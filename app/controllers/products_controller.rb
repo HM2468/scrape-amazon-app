@@ -12,8 +12,7 @@ class ProductsController < ApplicationController
 
   def fetch_amazon_data
     @product = AmazonScrapeService.new(params[:url]).fetch_data if params[:url].present?
-    @product ||= Product.new 
-
+    @product ||= Product.new
     respond_to do |format|
       format.html
       format.json { render json: @product }

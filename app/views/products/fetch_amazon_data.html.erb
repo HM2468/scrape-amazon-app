@@ -1,0 +1,31 @@
+<div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center">
+  <div class="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
+    <h2 class="text-xl font-semibold mb-4">Paste Amazon URL</h2>
+    <%= form_tag fetch_amazon_data_products_path, method: :get, data: { turbo_frame: "product_details" } do %>
+      <div class="mb-4">
+        <%= text_field_tag :url, nil, placeholder: "Paste Amazon URL here", autofocus: true, class: "input border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 rounded-md shadow-sm w-full" %>
+      </div>
+      <%= submit_tag "Fetch Data", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+    <% end %>
+  </div>
+</div>
+
+<turbo-frame id="product_details" style="display:none;">
+  <%= render @product %>
+</turbo-frame>
+
+<script>
+  document.addEventListener('turbo:load', () => {
+    document.querySelector('form').addEventListener('submit', () => {
+      const modal = document.getElementById('modal');
+      const productDetails = document.getElementById('product_details');
+
+      // Ensure the modal is hidden right after submitting the form
+      modal.style.display = 'none';
+
+      // Ensure the product details are displayed as soon as the form is submitted
+      productDetails.style.display = 'block';
+    });
+  });
+</script>
+
