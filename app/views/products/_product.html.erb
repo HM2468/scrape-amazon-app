@@ -1,17 +1,21 @@
 <div id="<%= dom_id product %>">
   <p class="my-5">
-    <strong class="block font-medium mb-1">Name:</strong>
-    <%= product.name %>
+    <strong class="block font-medium mb-1"> <%= product.name %> </strong>
   </p>
 
   <p class="my-5">
-    <strong class="block font-medium mb-1">Brand:</strong>
-    <%= product.brand %>
+    <strong class="block font-medium mb-1">Brand: <%= product.brand %> </strong>
   </p>
 
   <p class="my-5">
-    <strong class="block font-medium mb-1">Origin price:</strong>
-    <%= product.origin_price %>
+    <strong class="block font-medium mb-1">Price: <%= "$#{product.origin_price }" %> </strong>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Images:</strong>
+    <% product.images.each do |image_url| %>
+      <img src="<%= image_url %>" alt="Product image" class="mb-2">
+    <% end %>
   </p>
 
   <p class="my-5">
@@ -20,23 +24,7 @@
   </p>
 
   <p class="my-5">
-    <strong class="block font-medium mb-1">Asin:</strong>
-    <%= product.asin %>
-  </p>
-
-  <p class="my-5">
-    <strong class="block font-medium mb-1">Amazon link:</strong>
-    <%= product.amazon_link %>
-  </p>
-
-  <p class="my-5">
-    <strong class="block font-medium mb-1">Created at:</strong>
-    <%= product.created_at %>
-  </p>
-
-  <p class="my-5">
-    <strong class="block font-medium mb-1">Updated at:</strong>
-    <%= product.updated_at %>
+    <%= link_to 'View on Amazon', product.amazon_link, target: '_blank', rel: 'noopener noreferrer' %>
   </p>
 
   <% if action_name != "show" %>
