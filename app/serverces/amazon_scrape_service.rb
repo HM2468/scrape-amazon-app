@@ -2,6 +2,7 @@ class AmazonScrapeService
     require 'yaml'
 
     def initialize(url, create_product: false)
+        @create_product = create_product
         @selectors = YAML.load_file(Rails.root.join('config', 'scraper', 'selectors.yml'))
 
         # copy from chrome, temporarily used to avoid being blocked from amazon scraper detector
@@ -52,7 +53,7 @@ class AmazonScrapeService
 
         extract_data(html)
         post_process
-        Product.create!(**@parsed_data) if create_product
+        Product.create!(**@parsed_data) if @create_product
     end
 
     private
