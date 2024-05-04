@@ -24,7 +24,7 @@ class AmazonScrapeService
 
         # extract asin
         @asin = extract_asin(url)
-        return @project.errors.add(:base, 'invalid amazon produnct URL') if @asin.nil?
+        return @product.errors.add(:base, 'invalid amazon produnct URL') if @asin.nil?
 
         # asin redis key
         @asin_key = "asin:#{@asin}"
@@ -37,7 +37,7 @@ class AmazonScrapeService
         begin
           response = RestClient.get(@url, headers: @headers)
         rescue => e
-          return @project.errors.add(:base, e.messages)
+          return @product.errors.add(:base, e.messages)
         end
 
         product = Product.find_by(asin: @asin)
@@ -53,8 +53,8 @@ class AmazonScrapeService
 
         extract_data(html)
         post_process
-        @project.assign_attributes(**@parsed_data)
-        @project
+        @product.assign_attributes(**@parsed_data)
+        @product
     end
 
     private
