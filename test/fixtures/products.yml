@@ -6,7 +6,9 @@ one:
   origin_price: 1.5
   description: MyText
   asin: MyString
-  images: MyString
+  amazon_link: MyString
+  created_at: 2024-05-04 15:38:59
+  updated_at: 2024-05-04 15:38:59
 
 two:
   name: MyString
@@ -14,4 +16,6 @@ two:
   origin_price: 1.5
   description: MyText
   asin: MyString
-  images: MyString
+  amazon_link: MyString
+  created_at: 2024-05-04 15:38:59
+  updated_at: 2024-05-04 15:38:59
