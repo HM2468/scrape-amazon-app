@@ -3,17 +3,23 @@ class AmazonScrapeService
 
     def initialize(url)
         @selectors = YAML.load_file(Rails.root.join('config', 'scraper', 'selectors.yml'))
+
+        # copy from chrome, temporarily used to avoid being blocked from amazon scraper detector
         @headers = {
-            'DNT' => '1',
-            'Upgrade-Insecure-Requests' => '1',
-            'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36',
-            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'Sec-Fetch-Site' => 'same-origin',
-            'Sec-Fetch-Mode' => 'navigate',
-            'Sec-Fetch-User' => '?1',
-            'Sec-Fetch-Dest' => 'document',
-            'Referer' => 'https://www.amazon.com/',
-            'Accept-Language' => 'en-GB,en-US;q=0.9,en;q=0.8'
+          'accept' =>  '*/*',
+          'Accept-Encoding' =>  'gzip, deflate, br, zstd',
+          'Accept-Language' =>  'zh,zh-CN;q=0.9,en;q=0.8',
+          'Connection' =>  'keep-alive',
+          'Content-Type' =>  'text/plain;charset=UTF-8',
+          'Cookie' =>  'session-id=131-1598766-4889943; skin=noskin; ubid-main=131-6778161-0238132; x-main="bxv0rssmii0ENFZ2P54O74FvEOoOqrjx?7nW5Xp03RXVIMaOeZfH304eCnSQJvt8"; at-main=Atza|IwEBIIHiQBP2ekN9tCj75ZsZmZCoNsXKGnikQhSe6I2OvVa52biMT5vwMeqiyI4V918rcOWRM9biQUC2TX8CW0YiMIMU5zQrvjE8LkAcbhLYBS6Vt3sdwS1ST_k2XUiDCQIRtoRFQqVPee_8aAXk7vy1BBC0ixLj1kud2tuluFytgRHEy_bLh7aU3yfksl9oolxqsODyrAanUfOsFGq-oDQqVZgJgFXFnshd3cLZ-HRK2eCyqw; sess-at-main="N3rC9LAQuFREfxJTMvmIc3Ay3f8OlEX2BZ1EvY9skv4="; sst-main=Sst1|PQF0ropFT7lc4exFGM5BATs2CeFOmpuMPXdAAM6jLx6CSZnsbg3a056aiqsltwQspzdog0bwEwnZ8BR59tLVUZegpd-HP348mse0YM6kTsslDvpq0pp5x9MgCKwPCpYrdpybPtTCO-ZSeEWpYZVzs3Ygq-aOnGw96iVyo6mc6nAZOM9J4PEMAmlm1boNjc17WyPV3hmkXv9lNsGKBdmVInO8isIo3iOcKat_9r5phf-PwTmJ9eQnBAX2a8aLCcwP8GZYu-LrCy29yf2zw-H2Gw3pxGjTCnigrahN_NVvCq2BMSs',
+          'Referer' =>  'https => //www.amazon.com/',
+          'Sec-Fetch-Dest' =>  'empty',
+          'Sec-Fetch-Mode' =>  'no-cors',
+          'Sec-Fetch-Site' =>  'same-site',
+          'User-Agent' =>  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'sec-ch-ua' =>  '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+          'sec-ch-ua-mobile' =>  '?0',
+          'sec-ch-ua-platform' =>  'macOS'
         }
 
         # extract asin
