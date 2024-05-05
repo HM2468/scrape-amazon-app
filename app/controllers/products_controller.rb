@@ -11,7 +11,7 @@ class ProductsController < ApplicationController
   end
 
   def fetch_amazon_data
-    @product = AmazonScrapeService.new(params[:url]).fetch_data if params[:url].present?
+    @product = AmazonScrapeService.new(url: params[:url]).fetch_data if params[:url].present?
     @product ||= Product.new
     respond_to do |format|
       format.html
@@ -20,7 +20,7 @@ class ProductsController < ApplicationController
   end
 
   def save_amazon_data
-    @product = AmazonScrapeService.new(params[:url]).save_data
+    @product = AmazonScrapeService.new(asin: params[:asin]).save_data
 
     respond_to do |format|
       if @product.save

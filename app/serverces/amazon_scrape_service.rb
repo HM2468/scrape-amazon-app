@@ -1,7 +1,7 @@
 class AmazonScrapeService
     require 'yaml'
 
-    def initialize(url)
+    def initialize(url: nil, asin: nil)
         @product = Product.new
         @selectors = YAML.load_file(Rails.root.join('config', 'scraper', 'selectors.yml'))
         # copy from chrome, temporarily used to avoid being blocked from amazon scraper detector
@@ -21,9 +21,8 @@ class AmazonScrapeService
           'sec-ch-ua-mobile' =>  '?0',
           'sec-ch-ua-platform' =>  'macOS'
         }
-
-        # extract asin
-        @asin = extract_asin(url)
+        @asin = extract_asin(url) if url.present?
+        @asin ||= asin
         return @product.errors.add(:base, 'invalid amazon produnct URL') if @asin.nil?
 
         # asin redis key
@@ -34,15 +33,17 @@ class AmazonScrapeService
     end
 
     def fetch_data
+        return @product if @product.errors.any?
+
         begin
           response = RestClient.get(@url, headers: @headers)
         rescue => e
           return @product.errors.add(:base, e.messages)
         end
 
-        product = Product.find_by(asin: @asin)
-        # already exists in database
-        return product.attributes.deep_symbolize_keys if product
+        # record already exists in database
+        record = Product.find_by(asin: @asin)
+        return record if record
 
         # reduce the probability of being blocked from amazon scraper detector by reducing the request frequency
         # It is only a temporary solution and can not radically eliminate this issue
@@ -58,6 +59,10 @@ class AmazonScrapeService
     end
 
     def save_data
+      record = Product.find_by(asin: @asin)
+      return record if record
+      return @product if @product.errors.any?
+
       html = Rails.cache.read(@asin_key)
       extract_data(html)
       post_process
@@ -68,8 +73,10 @@ class AmazonScrapeService
     private
 
     def extract_asin(url)
+      return nil unless url.is_a?(String)
+      return nil unless url.start_with?('https://www.amazon.com')
       match = url.match(/\/dp\/([A-Z0-9]{10})/)
-      match ? match[1] : nil
+      asin = match ? match[1] : nil
     end
 
     def extract_data(html)
