@@ -19,6 +19,7 @@ gem 'stimulus-rails'
 gem "tailwindcss-rails", "~> 2.5"
 gem 'nokogiri'
 gem 'rest-client'
+gem 'httparty'
 
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ]
