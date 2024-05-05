@@ -38,7 +38,8 @@ class AmazonScrapeService
         begin
           response = RestClient.get(@url, headers: @headers)
         rescue => e
-          return @product.errors.add(:base, e.messages)
+          @product.errors.add(:base, e.message)
+          return @product
         end
 
         # record already exists in database
