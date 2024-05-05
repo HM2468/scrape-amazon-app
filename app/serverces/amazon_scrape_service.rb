@@ -36,7 +36,7 @@ class AmazonScrapeService
         return @product if @product.errors.any?
 
         begin
-          response = RestClient.get(@url, headers: @headers)
+          response = HTTParty.get(@url, headers: @headers)
         rescue => e
           @product.errors.add(:base, e.message)
           return @product
