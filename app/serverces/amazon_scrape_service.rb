@@ -22,7 +22,6 @@ class AmazonScrapeService
         }
 
         @asin = extract_asin(url) if url.present?
-        @asin ||= asin
         return @product.errors.add(:base, 'invalid amazon produnct URL') if @asin.nil?
 
         # asin redis key
@@ -36,9 +35,9 @@ class AmazonScrapeService
         return @product if @product.errors.any?
 
         begin
-          response = HTTParty.get(@url, headers: @headers)
+          response = RestClient.get(@url, headers: @headers)
         rescue => e
-          @product.errors.add(:base, e.message)
+          @product.errors.add(:base, "Request has been blocked by amazon, errrors: #{ e.message }")
           return @product
         end
 
@@ -67,6 +66,8 @@ class AmazonScrapeService
       return @product if @product.errors.any?
 
       html = Rails.cache.read(@asin_key)
+      return @product if html.nil?
+
       extract_data(html)
       post_process
       @product.assign_attributes(**@parsed_data)

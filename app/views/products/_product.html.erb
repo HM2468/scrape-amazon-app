@@ -19,7 +19,9 @@
   </p>
 
   <p class="my-5">
-    <strong class="block font-medium mb-1">Price: <%= "$#{product.origin_price }" %> </strong>
+    <% if product.origin_price.present? %>
+      <strong class="block font-medium mb-1">Price: <%= "$#{product.origin_price }" %> </strong>
+    <% end %>
   </p>
 
   <p class="my-5">
@@ -45,8 +47,11 @@
       <%= link_to "Show this product", product, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
       <%= link_to "Edit this product", edit_product_path(product), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
     <% else %>
-      <% if product.asin.present? %>
-        <%= link_to "Save this product", save_amazon_data_products_path(asin: product.asin), class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+      <% if product.name.present? %>
+        <%= form_with url: save_amazon_data_products_path, method: :post, local: true do |form| %>
+          <%= form.hidden_field :url, value: product.amazon_link %>
+          <%= form.submit "Save this product", class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium", data: { turbo: false } %>
+        <% end %>
       <% end %>
     <% end %>
     <hr class="mt-6">

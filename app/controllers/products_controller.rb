@@ -20,7 +20,7 @@ class ProductsController < ApplicationController
   end
 
   def save_amazon_data
-    @product = AmazonScrapeService.new(asin: params[:asin]).save_data
+    @product = AmazonScrapeService.new(url: params[:url]).save_data
 
     respond_to do |format|
       if @product.save

@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   resources :products do
     collection do
       get 'fetch_amazon_data'
-      get 'save_amazon_data'
+      post 'save_amazon_data'
     end
   end
 end
